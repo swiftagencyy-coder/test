@@ -8,8 +8,8 @@ export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
         }),
         EmailProvider({
             server: process.env.EMAIL_SERVER,
@@ -33,5 +33,10 @@ export const authOptions: NextAuthOptions = {
         signIn: "/login",
     },
     */
-    debug: process.env.NODE_ENV === "development",
+    debug: true,
+    logger: {
+        error(code, metadata) {
+            console.error("NEXTAUTH_ERROR", code, metadata);
+        },
+    },
 };

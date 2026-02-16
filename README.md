@@ -20,6 +20,14 @@ npm install
 npx prisma generate
 ```
 
+**Sync Database to Production:**
+Since you are using a new database (Supabase/Railway), you must sync the tables:
+```bash
+npx prisma db push
+```
+> [!IMPORTANT]
+> Run this command locally while your `.env` is pointing to your production `DATABASE_URL`. This creates the required tables for NextAuth to function.
+
 ### 3. Environment Variables & APIs
 
 You need to create a `.env` file in the project root. Below is a detailed guide on each variable and where to get the keys.
@@ -29,9 +37,11 @@ You need to create a `.env` file in the project root. Below is a detailed guide 
 | `DATABASE_URL` | PostgreSQL connection string. | Use [Supabase](https://supabase.com) (free) or [Railway](https://railway.app). |
 | `NEXTAUTH_SECRET` | Used for encrypting session tokens. | Generate a random string using `openssl rand -base64 32` or just type random characters. |
 | `NEXTAUTH_URL` | The public URL of your app. | `http://localhost:3000` for development. Unset on Vercel (it manages itself). |
-| `OPENAI_API_KEY` | For the AI personalization engine. | Create an account at [platform.openai.com](https://platform.openai.com) and generate an API key. |
-| `GOOGLE_CLIENT_ID` | For "Sign in with Google" feature. | Create a project in [Google Cloud Console](https://console.cloud.google.com/), set up OAuth credentials. |
-| `GOOGLE_CLIENT_SECRET` | Secret key for Google Login. | Same as above (Client ID creation). |
+| `OPENAI_API_KEY` | For the AI personalization engine. | [platform.openai.com](https://platform.openai.com) |
+| `GOOGLE_CLIENT_ID` | For "Sign in with Google" feature. | [Cloud Console](https://console.cloud.google.com/) |
+| `GOOGLE_CLIENT_SECRET` | Secret key for Google Login. | Same as above. |
+| `EMAIL_SERVER` | SMTP connection string (e.g. `smtp://user:pass@smtp.example.com:587`). | [Resend](https://resend.com) or [SendGrid](https://sendgrid.com). |
+| `EMAIL_FROM` | The email address the login link is sent from. | Your verified sender email. |
 
 #### Step-by-Step API Setup:
 
@@ -41,14 +51,15 @@ You need to create a `.env` file in the project root. Below is a detailed guide 
 3. Go to **Project Settings** > **Database** > **Connection string**.
 4. Copy the **URI** and paste it as your `DATABASE_URL`.
 
-**B. AI Personalization (OpenAI)**
-1. Go to [OpenAI API Keys](https://platform.openai.com/api-keys).
-2. Create a new secret key.
-3. Paste it as `OPENAI_API_KEY`. 
-   > [!TIP]
-   > Set a usage limit in your OpenAI dashboard to avoid unexpected costs.
+**B. Email Service (Resend - Recommended)**
+1. Create a free account at [Resend.com](https://resend.com).
+2. Go to **API Keys** and create a new key.
+3. Your `EMAIL_SERVER` will look like this:
+   `smtp://resend:re_YourApiKeyHere@smtp.resend.com:587`
+4. Set `EMAIL_FROM` to an email using your own domain (e.g., `login@yourdomain.com`).
+   - *Note: You must verify your domain in Resend's "Domains" tab.*
 
-**C. Authentication (Google Login)**
+**C. AI Personalization (OpenAI)**
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
 2. Create **OAuth 2.0 Client IDs**.
 3. Set **Authorized redirect URIs** to:
