@@ -49,7 +49,10 @@ You need to create a `.env` file in the project root. Below is a detailed guide 
 1. Go to [Supabase](https://supabase.com).
 2. Create a new project.
 3. Go to **Project Settings** > **Database** > **Connection string**.
-4. Copy the **URI** and paste it as your `DATABASE_URL`.
+4. Select the **Connection Pooler** tab.
+5. Set the Mode to **Session**.
+6. Copy the connection string (it should use port **5432**).
+7. Paste it as both `DATABASE_URL` and `DIRECT_URL` in your `.env`.
 
 **B. Email Service (Resend - Recommended)**
 1. Create a free account at [Resend.com](https://resend.com).
