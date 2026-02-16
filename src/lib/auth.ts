@@ -4,6 +4,12 @@ import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
 import prisma from "@/lib/prisma";
 
+const secret = process.env.NEXTAUTH_SECRET;
+
+if (!secret && process.env.NODE_ENV === "production") {
+    console.warn("WARNING: NEXTAUTH_SECRET is not defined in production environment variables.");
+}
+
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     providers: [
@@ -19,7 +25,7 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: secret,
     callbacks: {
         async session({ session, token }) {
             if (token && session.user) {
