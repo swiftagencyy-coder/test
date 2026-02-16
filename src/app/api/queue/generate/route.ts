@@ -3,6 +3,9 @@ import { generateDailyTasks } from "@/lib/task-engine";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
