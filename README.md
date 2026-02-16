@@ -84,12 +84,14 @@ git push -u origin main
 1. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
 2. Click **Add New** > **Project**.
 3. Import the `test` repository.
-4. **Environment Variables**: Expand this section and add the variables from your `.env` file:
-   - `DATABASE_URL`
-   - `NEXTAUTH_SECRET`
-   - `OPENAI_API_KEY`
-   - `GOOGLE_CLIENT_ID` / `SECRET` (if using Google Auth)
+4. **IMPORTANT**: Expand the **Environment Variables** section. **You must copy ALL values from your local `.env` here manually.**
+   - Vercel cannot see your local `.env` file (it is ignored by security rules).
+   - Add these keys: `DATABASE_URL`, `NEXTAUTH_SECRET`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
+   - For `NEXTAUTH_SECRET`, make sure it's a long random string.
 5. Click **Deploy**.
+
+> [!WARNING]
+> If you already deployed and see "Server Error", go to **Settings** > **Environment Variables** in Vercel, add the keys, and then **Redeploy** the latest commit.
 
 ## Human-in-the-loop Workflow
 1. **Import Leads**: Upload your target handles via CSV.

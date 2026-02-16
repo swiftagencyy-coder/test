@@ -27,7 +27,11 @@ export const authOptions: NextAuthOptions = {
             return session;
         },
     },
+    // Removal of custom pages to use NextAuth defaults until pages are built
+    /*
     pages: {
         signIn: "/login",
     },
+    */
+    debug: process.env.NODE_ENV === "development",
 };
