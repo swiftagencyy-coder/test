@@ -6,12 +6,8 @@ import prisma from "@/lib/prisma";
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-if (process.env.NODE_ENV === "production") {
-    if (!secret) {
-        console.error("FATAL: NEXTAUTH_SECRET is MISSING in production environment variables.");
-    } else {
-        console.log("NEXTAUTH_SECRET is present (starts with: " + secret.substring(0, 3) + "...)");
-    }
+if (process.env.NODE_ENV === "production" && !secret) {
+    console.error("FATAL: NEXTAUTH_SECRET is missing in production environment.");
 }
 
 export const authOptions: NextAuthOptions = {
