@@ -1,18 +1,57 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/main-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings, Shield, User, Bell, ExternalLink } from "lucide-react";
+import { Settings, Shield, User, Bell, ExternalLink, Loader2, Check } from "lucide-react";
+import { useWorkspace } from "@/components/providers/workspace-provider";
 
 const SettingsPage = () => {
+    const { activeWorkspace } = useWorkspace();
+    const [workspaceName, setWorkspaceName] = useState("");
+    const [isUpdatingWorkspace, setIsUpdatingWorkspace] = useState(false);
+    const [justUpdated, setJustUpdated] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (activeWorkspace) {
+            setWorkspaceName(activeWorkspace.name);
+        }
+    }, [activeWorkspace]);
+
+    const handleUpdateWorkspace = async () => {
+        if (!activeWorkspace || !workspaceName) return;
+        setIsUpdatingWorkspace(true);
+        try {
+            const res = await fetch("/api/workspaces", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: activeWorkspace.id, name: workspaceName }),
+            });
+            if (res.ok) {
+                setJustUpdated("workspace");
+                setTimeout(() => setJustUpdated(null), 3000);
+                // In a real app, you'd trigger a global refresh here too
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsUpdatingWorkspace(false);
+        }
+    };
+
+    const handleFakeSave = (id: string) => {
+        setJustUpdated(id);
+        setTimeout(() => setJustUpdated(null), 3000);
+    };
+
     return (
         <MainLayout>
             <div className="p-8">
-                <div className="mb-8">
+                <div className="mb-8 text-sky-600">
                     <h2 className="text-3xl font-bold tracking-tight">System Settings</h2>
                     <p className="text-muted-foreground">
                         Configure your workspace, AI preferences, and account security.
@@ -20,7 +59,7 @@ const SettingsPage = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-8 max-w-4xl">
-                    <Card>
+                    <Card className="border-l-4 border-l-sky-500">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <User className="h-5 w-5 text-sky-600" />
@@ -34,7 +73,11 @@ const SettingsPage = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Workspace Name</Label>
-                                    <Input placeholder="Main Workspace" defaultValue="Main Workspace" />
+                                    <Input
+                                        placeholder="Main Workspace"
+                                        value={workspaceName}
+                                        onChange={(e) => setWorkspaceName(e.target.value)}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Outreach Speed</Label>
@@ -45,7 +88,19 @@ const SettingsPage = () => {
                                     </select>
                                 </div>
                             </div>
-                            <Button size="sm">Update Workspace</Button>
+                            <Button
+                                size="sm"
+                                className="bg-sky-600 hover:bg-sky-700"
+                                onClick={handleUpdateWorkspace}
+                                disabled={isUpdatingWorkspace}
+                            >
+                                {isUpdatingWorkspace ? (
+                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                ) : justUpdated === "workspace" ? (
+                                    <Check className="h-4 w-4 mr-2" />
+                                ) : null}
+                                Update Workspace
+                            </Button>
                         </CardContent>
                     </Card>
 
@@ -68,7 +123,14 @@ const SettingsPage = () => {
                                         <p className="text-xs text-muted-foreground">Connected using environment key</p>
                                     </div>
                                 </div>
-                                <Button variant="ghost" size="sm">Configure</Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleFakeSave("ai")}
+                                >
+                                    {justUpdated === "ai" ? <Check className="h-4 w-4 mr-1" /> : null}
+                                    Configure
+                                </Button>
                             </div>
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50">
                                 <div className="flex items-center gap-3">
@@ -106,6 +168,14 @@ const SettingsPage = () => {
                                     <span className="text-sm group-hover:text-sky-600 transition">Reminder to complete daily queue</span>
                                 </label>
                             </div>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleFakeSave("notif")}
+                            >
+                                {justUpdated === "notif" ? <Check className="h-4 w-4 mr-1" /> : null}
+                                Save Notifications
+                            </Button>
                         </CardContent>
                     </Card>
                 </div>

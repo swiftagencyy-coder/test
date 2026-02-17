@@ -14,6 +14,7 @@ import {
 import { Plus } from "lucide-react";
 import { useWorkspace } from "@/components/providers/workspace-provider";
 import { ImportLeadsModal } from "@/components/import-leads-modal";
+import { AddLeadModal } from "@/components/add-lead-modal";
 
 interface Lead {
     id: string;
@@ -65,10 +66,12 @@ const LeadsPage = () => {
                                 onSuccess={fetchLeads}
                             />
                         )}
-                        <Button>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Lead
-                        </Button>
+                        {activeWorkspace && (
+                            <AddLeadModal
+                                workspaceId={activeWorkspace.id}
+                                onSuccess={fetchLeads}
+                            />
+                        )}
                     </div>
                 </div>
                 <div className="border rounded-md">

@@ -47,3 +47,36 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
+
+export async function PATCH(req: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const { id, name } = await req.json();
+
+        if (!id || !name) {
+            return NextResponse.json({ error: "ID and Name required" }, { status: 400 });
+        }
+
+        const updatedWorkspace = await prisma.workspace.update({
+            where: {
+                id,
+                members: {
+                    some: {
+                        userId: (session.user as any).id,
+                        role: "OWNER",
+                    },
+                },
+            },
+            data: { name },
+        });
+
+        return NextResponse.json(updatedWorkspace);
+    } catch (error) {
+        console.error("Workspace update error:", error);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    }
+}
