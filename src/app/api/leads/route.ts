@@ -52,8 +52,20 @@ export async function POST(req: NextRequest) {
 
         const formattedHandle = handle.startsWith("@") ? handle : `@${handle}`;
 
-        const lead = await prisma.lead.create({
-            data: {
+        const lead = await prisma.lead.upsert({
+            where: {
+                handle_workspaceId: {
+                    handle: formattedHandle,
+                    workspaceId,
+                },
+            },
+            update: {
+                name: name || undefined,
+                niche: niche || undefined,
+                city: city || undefined,
+                bio: bio || undefined,
+            },
+            create: {
                 handle: formattedHandle,
                 name,
                 niche,
@@ -65,7 +77,10 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(lead);
     } catch (error) {
-        console.error("Lead create error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("Lead create error detailed:", error);
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : "Internal server error" },
+            { status: 500 }
+        );
     }
 }
